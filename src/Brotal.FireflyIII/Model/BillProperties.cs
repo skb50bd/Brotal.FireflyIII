@@ -70,7 +70,7 @@ namespace Brotal.FireflyIII.Model
         /// <param name="nextExpectedMatch">When the subscription is expected to be due.</param>
         /// <param name="nextExpectedMatchDiff">Formatted (locally) when the subscription is due.</param>
         [JsonConstructor]
-        public BillProperties(Option<DateTime?> createdAt = default, Option<DateTime?> updatedAt = default, Option<string?> name = default, Option<bool?> objectHasCurrencySetting = default, Option<string?> currencyId = default, Option<string?> currencyName = default, Option<string?> currencyCode = default, Option<string?> currencySymbol = default, Option<int?> currencyDecimalPlaces = default, Option<string?> primaryCurrencyId = default, Option<string?> primaryCurrencyName = default, Option<string?> primaryCurrencyCode = default, Option<string?> primaryCurrencySymbol = default, Option<int?> primaryCurrencyDecimalPlaces = default, Option<string?> amountMin = default, Option<string?> pcAmountMin = default, Option<string?> amountMax = default, Option<string?> pcAmountMax = default, Option<string?> amountAvg = default, Option<string?> pcAmountAvg = default, Option<DateTime?> date = default, Option<DateTime?> endDate = default, Option<DateTime?> extensionDate = default, Option<BillRepeatFrequency?> repeatFreq = default, Option<int?> skip = default, Option<bool?> active = default, Option<int?> order = default, Option<string?> notes = default, Option<string?> objectGroupId = default, Option<int?> objectGroupOrder = default, Option<string?> objectGroupTitle = default, Option<List<BillPropertiesPaidDatesInner>?> paidDates = default, Option<List<DateTime>?> payDates = default, Option<DateTime?> nextExpectedMatch = default, Option<string?> nextExpectedMatchDiff = default)
+        public BillProperties(Option<DateTime?> createdAt = default, Option<DateTime?> updatedAt = default, Option<string?> name = default, Option<bool?> objectHasCurrencySetting = default, Option<string?> currencyId = default, Option<string?> currencyName = default, Option<string?> currencyCode = default, Option<string?> currencySymbol = default, Option<int?> currencyDecimalPlaces = default, Option<string?> primaryCurrencyId = default, Option<string?> primaryCurrencyName = default, Option<string?> primaryCurrencyCode = default, Option<string?> primaryCurrencySymbol = default, Option<int?> primaryCurrencyDecimalPlaces = default, Option<string?> amountMin = default, Option<string?> pcAmountMin = default, Option<string?> amountMax = default, Option<string?> pcAmountMax = default, Option<string?> amountAvg = default, Option<string?> pcAmountAvg = default, Option<DateTime?> date = default, Option<DateTime?> endDate = default, Option<DateTime?> extensionDate = default, Option<BillRepeatFrequency?> repeatFreq = default, Option<int?> skip = default, Option<bool?> active = default, Option<int?> order = default, Option<string?> notes = default, Option<int?> objectGroupId = default, Option<int?> objectGroupOrder = default, Option<string?> objectGroupTitle = default, Option<List<BillPropertiesPaidDatesInner>?> paidDates = default, Option<List<DateTime>?> payDates = default, Option<DateTime?> nextExpectedMatch = default, Option<string?> nextExpectedMatchDiff = default)
         {
             CreatedAtOption = createdAt;
             UpdatedAtOption = updatedAt;
@@ -529,7 +529,7 @@ namespace Brotal.FireflyIII.Model
         /// </summary>
         [JsonIgnore]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
-        public Option<string?> ObjectGroupIdOption { get; private set; }
+        public Option<int?> ObjectGroupIdOption { get; private set; }
 
         /// <summary>
         /// The group ID of the group this object is part of. NULL if no group.
@@ -537,7 +537,7 @@ namespace Brotal.FireflyIII.Model
         /// <value>The group ID of the group this object is part of. NULL if no group.</value>
         /* <example>5</example> */
         [JsonPropertyName("object_group_id")]
-        public string? ObjectGroupId { get { return this.ObjectGroupIdOption; } set { this.ObjectGroupIdOption = new(value); } }
+        public int? ObjectGroupId { get { return this.ObjectGroupIdOption; } set { this.ObjectGroupIdOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of ObjectGroupOrder
@@ -765,7 +765,7 @@ namespace Brotal.FireflyIII.Model
             Option<bool?> active = default;
             Option<int?> order = default;
             Option<string?> notes = default;
-            Option<string?> objectGroupId = default;
+            Option<int?> objectGroupId = default;
             Option<int?> objectGroupOrder = default;
             Option<string?> objectGroupTitle = default;
             Option<List<BillPropertiesPaidDatesInner>?> paidDates = default;
@@ -875,7 +875,7 @@ namespace Brotal.FireflyIII.Model
                             notes = new Option<string?>(utf8JsonReader.GetString());
                             break;
                         case "object_group_id":
-                            objectGroupId = new Option<string?>(utf8JsonReader.GetString());
+                            objectGroupId = new Option<int?>(utf8JsonReader.TokenType == JsonTokenType.Null ? (int?)null : utf8JsonReader.GetInt32());
                             break;
                         case "object_group_order":
                             objectGroupOrder = new Option<int?>(utf8JsonReader.TokenType == JsonTokenType.Null ? (int?)null : utf8JsonReader.GetInt32());
@@ -1157,7 +1157,7 @@ namespace Brotal.FireflyIII.Model
 
             if (billProperties.ObjectGroupIdOption.IsSet)
                 if (billProperties.ObjectGroupIdOption.Value != null)
-                    writer.WriteString("object_group_id", billProperties.ObjectGroupId);
+                    writer.WriteNumber("object_group_id", billProperties.ObjectGroupId!.Value);
                 else
                     writer.WriteNull("object_group_id");
 

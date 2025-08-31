@@ -35,7 +35,7 @@ namespace Brotal.FireflyIII.Client
         /// <param name="value"></param>
         public Option(TType value)
         {
-            IsSet = true;
+            IsSet = value is not null;
             Value = value;
         }
 

@@ -44,7 +44,7 @@ namespace Brotal.FireflyIII.Model
         /// <param name="objectGroupId">The group ID of the group this object is part of. NULL if no group.</param>
         /// <param name="objectGroupTitle">The name of the group. NULL if no group.</param>
         [JsonConstructor]
-        public AutocompletePiggyBalance(string id, string name, Option<string?> nameWithBalance = default, Option<string?> currencyId = default, Option<string?> currencyCode = default, Option<string?> currencySymbol = default, Option<int?> currencyDecimalPlaces = default, Option<string?> objectGroupId = default, Option<string?> objectGroupTitle = default)
+        public AutocompletePiggyBalance(string id, string name, Option<string?> nameWithBalance = default, Option<string?> currencyId = default, Option<string?> currencyCode = default, Option<string?> currencySymbol = default, Option<int?> currencyDecimalPlaces = default, Option<int?> objectGroupId = default, Option<string?> objectGroupTitle = default)
         {
             Id = id;
             Name = name;
@@ -155,7 +155,7 @@ namespace Brotal.FireflyIII.Model
         /// </summary>
         [JsonIgnore]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
-        public Option<string?> ObjectGroupIdOption { get; private set; }
+        public Option<int?> ObjectGroupIdOption { get; private set; }
 
         /// <summary>
         /// The group ID of the group this object is part of. NULL if no group.
@@ -163,7 +163,7 @@ namespace Brotal.FireflyIII.Model
         /// <value>The group ID of the group this object is part of. NULL if no group.</value>
         /* <example>5</example> */
         [JsonPropertyName("object_group_id")]
-        public string? ObjectGroupId { get { return this.ObjectGroupIdOption; } set { this.ObjectGroupIdOption = new(value); } }
+        public int? ObjectGroupId { get { return this.ObjectGroupIdOption; } set { this.ObjectGroupIdOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of ObjectGroupTitle
@@ -241,7 +241,7 @@ namespace Brotal.FireflyIII.Model
             Option<string?> currencyCode = default;
             Option<string?> currencySymbol = default;
             Option<int?> currencyDecimalPlaces = default;
-            Option<string?> objectGroupId = default;
+            Option<int?> objectGroupId = default;
             Option<string?> objectGroupTitle = default;
 
             while (utf8JsonReader.Read())
@@ -281,7 +281,7 @@ namespace Brotal.FireflyIII.Model
                             currencyDecimalPlaces = new Option<int?>(utf8JsonReader.TokenType == JsonTokenType.Null ? (int?)null : utf8JsonReader.GetInt32());
                             break;
                         case "object_group_id":
-                            objectGroupId = new Option<string?>(utf8JsonReader.GetString());
+                            objectGroupId = new Option<int?>(utf8JsonReader.TokenType == JsonTokenType.Null ? (int?)null : utf8JsonReader.GetInt32());
                             break;
                         case "object_group_title":
                             objectGroupTitle = new Option<string?>(utf8JsonReader.GetString());
@@ -385,7 +385,7 @@ namespace Brotal.FireflyIII.Model
 
             if (autocompletePiggyBalance.ObjectGroupIdOption.IsSet)
                 if (autocompletePiggyBalance.ObjectGroupIdOption.Value != null)
-                    writer.WriteString("object_group_id", autocompletePiggyBalance.ObjectGroupId);
+                    writer.WriteNumber("object_group_id", autocompletePiggyBalance.ObjectGroupId!.Value);
                 else
                     writer.WriteNull("object_group_id");
 

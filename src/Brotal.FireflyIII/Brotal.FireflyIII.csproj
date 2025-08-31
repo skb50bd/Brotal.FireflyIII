@@ -6,15 +6,15 @@
     <AssemblyName>Brotal.FireflyIII</AssemblyName>
     <PackageId>Brotal.FireflyIII</PackageId>
     <OutputType>Library</OutputType>
-    <Authors>OpenAPI</Authors>
-    <Company>OpenAPI</Company>
-    <AssemblyTitle>OpenAPI Library</AssemblyTitle>
-    <Description>A library generated from a OpenAPI doc</Description>
+    <Authors>Shakib Haris</Authors>
+    <Company>Brotal</Company>
+    <AssemblyTitle>Brotal.FireflyIII</AssemblyTitle>
+    <Description>A library generated from a OpenAPI doc for Firefly-III</Description>
     <Copyright>No Copyright</Copyright>
     <RootNamespace>Brotal.FireflyIII</RootNamespace>
     <Version>1.0.0</Version>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Brotal.FireflyIII.xml</DocumentationFile>
-    <RepositoryUrl>https://github.com/GIT_USER_ID/GIT_REPO_ID.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/skb50bd/firefly-iii-ai-ingest.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes>Minor update</PackageReleaseNotes>
     <Nullable>enable</Nullable>
