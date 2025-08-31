@@ -12,14 +12,19 @@
     <Description>A library generated from a OpenAPI doc for Firefly-III</Description>
     <Copyright>No Copyright</Copyright>
     <RootNamespace>Brotal.FireflyIII</RootNamespace>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Brotal.FireflyIII.xml</DocumentationFile>
-    <RepositoryUrl>https://github.com/skb50bd/firefly-iii-ai-ingest.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/skb50bd/Brotal.FireflyIII.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes>Minor update</PackageReleaseNotes>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <Nullable>enable</Nullable>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.5" />
