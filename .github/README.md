@@ -35,18 +35,20 @@ java -jar "<path>/openapi-generator/modules/openapi-generator-cli/target/openapi
 
 The workflow (`build-and-publish.yml`) performs the following actions:
 
-1. **Build Job**: Runs on every PR and tag push
+1. **Build Job**: Runs on every PR, tag push, and manual trigger
+   - Extracts version from `src/Brotal.FireflyIII/Brotal.FireflyIII.csproj`
    - Restores dependencies
    - Builds the solution
    - Runs tests
-   - Creates NuGet package
+   - Creates NuGet package using the csproj version
    - Uploads artifacts
 
-2. **Publish Job**: Runs only on version tags (e.g., `v1.0.0`)
+2. **Publish Job**: Runs on version tags and manual triggers
    - Downloads the NuGet package
    - Validates the package
-   - Publishes to nuget.org
-   - Creates a GitHub release
+   - Checks if the version already exists on NuGet
+   - Publishes to nuget.org (if version doesn't exist)
+   - Creates a GitHub release (only for tag pushes)
 
 ## Setup Instructions
 
@@ -91,7 +93,7 @@ Ensure your repository has the following settings:
 
 ### Publishing a New Version
 
-1. **Update Version**: Modify the version in `src/Brotal.FireflyIII/Brotal.FireflyIII.csproj`
+1. **Update Version**: Modify the `<Version>` in `src/Brotal.FireflyIII/Brotal.FireflyIII.csproj`
 2. **Create Tag**: Create and push a version tag:
    ```bash
    git tag v1.0.0
@@ -99,13 +101,15 @@ Ensure your repository has the following settings:
    ```
 3. **Monitor**: Check the Actions tab in GitHub to monitor the build and publish process
 
-### Manual Trigger
+### Manual Publishing
 
-You can manually trigger the workflow:
+You can manually trigger the workflow to publish the current version:
 1. Go to Actions tab in your repository
 2. Select "Build and Publish NuGet Package"
 3. Click "Run workflow"
 4. Choose the branch and click "Run workflow"
+
+**Note**: The workflow will check if the version already exists on NuGet and skip publishing if it does.
 
 ### Testing Locally
 
@@ -126,9 +130,18 @@ dotnet pack src/Brotal.FireflyIII/Brotal.FireflyIII.csproj --configuration Relea
 
 ## Version Management
 
-The workflow automatically handles versioning:
-- **Tag-based**: When you push a tag like `v1.0.0`, it uses that version
-- **Pre-release**: For non-tag pushes, it creates a pre-release version like `0.0.0-prerelease-123`
+The workflow uses the version specified in `src/Brotal.FireflyIII/Brotal.FireflyIII.csproj`:
+- **Source**: `<Version>1.0.0</Version>` in the csproj file
+- **No Override**: The workflow doesn't override this version
+- **Duplicate Prevention**: Checks if the version already exists on NuGet before publishing
+
+### Updating Version
+
+To publish a new version:
+1. Edit `src/Brotal.FireflyIII/Brotal.FireflyIII.csproj`
+2. Change the `<Version>` tag to your new version (e.g., `1.0.1`)
+3. Commit and push the changes
+4. Create a corresponding Git tag: `git tag v1.0.1 && git push origin v1.0.1`
 
 ## Using the Library
 
@@ -193,8 +206,9 @@ dotnet add package Brotal.FireflyIII
    - Check if the API key is expired
 
 2. **Package Already Exists**
+   - The workflow automatically checks and skips if the version exists
+   - Update the version in the csproj file before publishing
    - NuGet doesn't allow overwriting existing packages
-   - Increment the version number before publishing
 
 3. **Build Failures**
    - Check the build logs in the Actions tab
@@ -205,6 +219,11 @@ dotnet add package Brotal.FireflyIII
    - Ensure you have the correct OpenAPI Generator version
    - Verify the input specification URL is accessible
    - Check the configuration file format
+
+5. **Version Not Published**
+   - Check if the version already exists on NuGet
+   - Verify the version in csproj file is correct
+   - Ensure the workflow completed successfully
 
 ### Useful Commands
 
@@ -221,6 +240,9 @@ dotnet add package Brotal.FireflyIII --source local
 
 # Regenerate from OpenAPI spec
 java -jar openapi-generator-cli.jar generate -c config.yaml
+
+# Check if package version exists on NuGet
+curl -s "https://api.nuget.org/v3/registration3/Brotal.FireflyIII/index.json" | grep -o '"version":"[^"]*"'
 ```
 
 ## Security Notes

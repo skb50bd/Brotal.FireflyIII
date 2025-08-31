@@ -26,16 +26,12 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
-    - name: Calculate version
+    - name: Get version from csproj
       id: version
       run: |
-        if [[ $GITHUB_REF == refs/tags/v* ]]; then
-          VERSION=${GITHUB_REF#refs/tags/v}
-        else
-          VERSION="0.0.0-prerelease-${{ github.run_number }}"
-        fi
+        VERSION=$(grep -o '<Version>.*</Version>' src/Brotal.FireflyIII/Brotal.FireflyIII.csproj | sed 's/<Version>\(.*\)<\/Version>/\1/')
         echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "Version: $VERSION"
+        echo "Version from csproj: $VERSION"
 
     - name: Restore dependencies
       run: dotnet restore Brotal.FireflyIII.sln
@@ -47,7 +43,7 @@ jobs:
       run: dotnet test Brotal.FireflyIII.sln --no-build --verbosity normal --configuration Release
 
     - name: Pack
-      run: dotnet pack src/Brotal.FireflyIII/Brotal.FireflyIII.csproj --configuration Release --no-build --output nupkgs -p:Version=${{ steps.version.outputs.version }}
+      run: dotnet pack src/Brotal.FireflyIII/Brotal.FireflyIII.csproj --configuration Release --no-build --output nupkgs
       env:
         VERSION: ${{ steps.version.outputs.version }}
 
@@ -70,7 +66,7 @@ jobs:
   publish:
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v') # Only publish on version tags
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
 
     steps:
     - name: Checkout code
@@ -92,12 +88,36 @@ jobs:
         echo "Validating NuGet package..."
         dotnet nuget verify nupkgs/*.nupkg
 
+    - name: Check if package exists on NuGet
+      id: check-package
+      run: |
+        PACKAGE_NAME="Brotal.FireflyIII"
+        VERSION=$(grep -o '<Version>.*</Version>' src/Brotal.FireflyIII/Brotal.FireflyIII.csproj | sed 's/<Version>\(.*\)<\/Version>/\1/')
+        echo "Checking if package $PACKAGE_NAME version $VERSION exists on NuGet..."
+
+        # Check if package version already exists
+        if curl -s "https://api.nuget.org/v3/registration3/$PACKAGE_NAME/index.json" | grep -q "\"$VERSION\""; then
+          echo "Package version $VERSION already exists on NuGet"
+          echo "skip_publish=true" >> $GITHUB_OUTPUT
+        else
+          echo "Package version $VERSION does not exist on NuGet, will publish"
+          echo "skip_publish=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Publish to NuGet
+      if: steps.check-package.outputs.skip_publish != 'true'
       run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 
+    - name: Skip publishing (package already exists)
+      if: steps.check-package.outputs.skip_publish == 'true'
+      run: |
+        echo "Skipping publish - package version already exists on NuGet"
+        echo "To publish a new version, update the Version in src/Brotal.FireflyIII/Brotal.FireflyIII.csproj"
+
     - name: Create Release
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
