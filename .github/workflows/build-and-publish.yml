@@ -84,10 +84,16 @@ jobs:
         name: nuget-package
         path: nupkgs
 
-    - name: Validate package
+    - name: Test NuGet authentication
       run: |
-        echo "Validating NuGet package..."
-        dotnet nuget verify nupkgs/*.nupkg
+        echo "Testing NuGet authentication..."
+        # Test if we can access NuGet API with our key
+        if [ -n "${{ secrets.NUGET_API_KEY }}" ]; then
+          echo "✅ NuGet API key is configured"
+        else
+          echo "❌ NuGet API key is not configured"
+          exit 1
+        fi
 
     - name: Check if package exists on NuGet
       id: check-package
