@@ -1,0 +1,10 @@
+# Brotal.FireflyIII.Model.ConfigValueFilter
+Title of the configuration value.
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+
+[[Back to Model list]](../../README.md#documentation-for-models) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to README]](../../README.md)
+

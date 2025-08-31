@@ -1,0 +1,125 @@
+name: Build and Publish NuGet Package
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on version tags
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # Allow manual trigger
+
+env:
+  NUGET_PACKAGE_NAME: Brotal.FireflyIII
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Required for version calculation
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Calculate version
+      id: version
+      run: |
+        if [[ $GITHUB_REF == refs/tags/v* ]]; then
+          VERSION=${GITHUB_REF#refs/tags/v}
+        else
+          VERSION="0.0.0-prerelease-${{ github.run_number }}"
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Version: $VERSION"
+
+    - name: Restore dependencies
+      run: dotnet restore Brotal.FireflyIII.sln
+
+    - name: Build
+      run: dotnet build Brotal.FireflyIII.sln --no-restore --configuration Release
+
+    - name: Test
+      run: dotnet test Brotal.FireflyIII.sln --no-build --verbosity normal --configuration Release
+
+    - name: Pack
+      run: dotnet pack src/Brotal.FireflyIII/Brotal.FireflyIII.csproj --configuration Release --no-build --output nupkgs -p:Version=${{ steps.version.outputs.version }}
+      env:
+        VERSION: ${{ steps.version.outputs.version }}
+
+    - name: Upload NuGet package
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-package
+        path: nupkgs/*.nupkg
+        retention-days: 30
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: |
+          src/Brotal.FireflyIII/bin/Release/
+          src/Brotal.FireflyIII.Test/bin/Release/
+        retention-days: 30
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') # Only publish on version tags
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Download NuGet package
+      uses: actions/download-artifact@v4
+      with:
+        name: nuget-package
+        path: nupkgs
+
+    - name: Validate package
+      run: |
+        echo "Validating NuGet package..."
+        dotnet nuget verify nupkgs/*.nupkg
+
+    - name: Publish to NuGet
+      run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref_name }}
+        body: |
+          ## What's Changed
+          
+          This release includes the latest updates to the Brotal.FireflyIII library.
+          
+          ### Package Details
+          - **Package ID**: Brotal.FireflyIII
+          - **Version**: ${{ github.ref_name }}
+          - **Target Framework**: .NET 9.0
+          
+          ### Installation
+          ```bash
+          dotnet add package Brotal.FireflyIII
+          ```
+          
+          ### NuGet
+          https://www.nuget.org/packages/Brotal.FireflyIII/
+        draft: false
+        prerelease: false
