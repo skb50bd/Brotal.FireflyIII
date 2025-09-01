@@ -1,21 +1,23 @@
 # 🔥 Brotal.FireflyIII
 
 [![NuGet](https://img.shields.io/nuget/v/Brotal.FireflyIII.svg)](https://www.nuget.org/packages/Brotal.FireflyIII/)
-[![License](https://img.shields.io/github/license/skb50bd/firefly-iii-ai-ingest.svg)](LICENSE)
+[![License](https://img.shields.io/github/license/skb50bd/Brotal.FireflyIII.svg)](./LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
 
 A comprehensive .NET client library for the [Firefly III](https://firefly-iii.org/) personal finance manager API, automatically generated from the official OpenAPI specification.
 
+
 ## 📋 Table of Contents
 
-- [About](#about)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Usage Examples](#usage-examples)
-- [API Information](#api-information)
-- [Generation](#generation)
-- [Development](#development)
-- [Troubleshooting](#troubleshooting)
+- [About](#🎯-about)
+- [Installation](#📦-installation)
+- [Quick Start](#🚀-quick-start)
+- [Usage Examples](#💡-usage-examples)
+- [API Information](#📚-api-information)
+- [Generation](#🔧-generation)
+- [Development](#🛠️-development)
+- [Troubleshooting](#🚨-troubleshooting)
+- [API Reference](#api-reference)
 
 ## 🎯 About
 
@@ -32,7 +34,7 @@ This C# SDK provides a complete .NET client for the Firefly III API, enabling yo
 
 ### 📦 Package Details
 
-- **SDK Version**: 1.0.0
+- **SDK Version**: 1.0.1
 - **Target Framework**: .NET 9.0
 - **API Version**: Firefly III API v6.3.0
 - **Generator**: OpenAPI Generator 7.16.0-SNAPSHOT
@@ -56,61 +58,39 @@ Install-Package Brotal.FireflyIII
 ### Basic Setup
 
 ```csharp
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Brotal.FireflyIII.Api;
-using Brotal.FireflyIII.Client;
-using Brotal.FireflyIII.Model;
-using Org.OpenAPITools.Extensions;
+var fireflyPat = 
+    builder
+        .Configuration
+        .GetValue<string>("Firefly:PersonalAccessToken");
 
-namespace YourProject
+var fireflyUrl = 
+    builder
+        .Configuration
+        .GetValue<string>("Firefly:Url");
+
+builder.Services.AddApi(options =>
 {
-    public class Program
+    BearerToken bearerToken = new(fireflyPat);
+    OAuthToken oauthToken = new(fireflyPat);
+    options.AddTokens(bearerToken);
+    options.AddTokens(oauthToken);
+    options.UseProvider<RateLimitProvider<BearerToken>, BearerToken>();
+    options.UseProvider<RateLimitProvider<OAuthToken>, OAuthToken>();
+
+    options.AddApiHttpClients(client =>
     {
-        public static async Task Main(string[] args)
-        {
-            var host = CreateHostBuilder(args).Build();
-            var api = host.Services.GetRequiredService<IAboutApi>();
-            IGetAboutApiResponse apiResponse = await api.GetAboutAsync("todo");
-            SystemInfo? model = apiResponse.Ok();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) => Host.CreateDefaultBuilder(args)
-          .ConfigureApi((context, services, options) =>
-          {
-              // Configure Bearer token authentication
-              BearerToken token = new("<your token>");
-              options.AddTokens(token);
-
-              // Configure HTTP client with retry policies
-              options.AddApiHttpClients(client =>
-              {
-                  // client configuration
-              }, builder =>
-              {
-                  builder
-                      .AddRetryPolicy(2)
-                      .AddTimeoutPolicy(TimeSpan.FromSeconds(5))
-                      .AddCircuitBreakerPolicy(10, TimeSpan.FromSeconds(30));
-              });
-          });
-    }
-}
+        client.BaseAddress = new Uri(fireflyUrl);
+    }, builder =>
+    {
+        builder
+            .AddRetryPolicy(2)
+            .AddTimeoutPolicy(TimeSpan.FromSeconds(10))
+            .AddCircuitBreakerPolicy(10, TimeSpan.FromSeconds(10));
+    });
+});
 ```
 
 ## 💡 Usage Examples
-
-### Authentication
-
-```csharp
-// Bearer Token Authentication
-BearerToken token = new("your-bearer-token");
-options.AddTokens(token);
-
-// API Key Authentication
-ApiKeyToken apiKey = new("your-api-key", "X-API-Key");
-options.AddTokens(apiKey);
-```
 
 ### Making API Calls
 
@@ -154,6 +134,7 @@ else
 }
 ```
 
+
 ## 📚 API Information
 
 - **Application Name**: Firefly III API v6.3.0
@@ -161,24 +142,40 @@ else
 - **Description**: Comprehensive API for Firefly III personal finance manager
 - **Documentation**: [Firefly III API Documentation](https://docs.firefly-iii.org/references/firefly-iii/api/)
 
-### Available APIs
+## API Reference
 
-The library includes clients for all Firefly III APIs:
+Below is a comprehensive list of available API documentation for this SDK. Each API is documented in detail in the [`docs/apis/`](docs/apis/) directory:
 
-- 📊 **AccountsApi** - Account management
-- 💰 **TransactionsApi** - Transaction operations
-- 🏷️ **CategoriesApi** - Category management
-- 📋 **BudgetsApi** - Budget operations
-- 🏦 **BillsApi** - Bill management
-- 🏷️ **TagsApi** - Tag operations
-- 🔍 **SearchApi** - Search functionality
-- 📈 **ChartsApi** - Chart data
-- ⚙️ **ConfigurationApi** - System configuration
-- 👥 **UsersApi** - User management
-- 🔗 **LinksApi** - Link management
-- 🎯 **RulesApi** - Rule processing
-- 📎 **AttachmentsApi** - File attachments
-- 🔔 **WebhooksApi** - Webhook management
+| API | Documentation |
+|-----|--------------|
+| AboutApi | [AboutApi.md](docs/apis/AboutApi.md) |
+| AccountsApi | [AccountsApi.md](docs/apis/AccountsApi.md) |
+| AttachmentsApi | [AttachmentsApi.md](docs/apis/AttachmentsApi.md) |
+| AutocompleteApi | [AutocompleteApi.md](docs/apis/AutocompleteApi.md) |
+| AvailableBudgetsApi | [AvailableBudgetsApi.md](docs/apis/AvailableBudgetsApi.md) |
+| BillsApi | [BillsApi.md](docs/apis/BillsApi.md) |
+| BudgetsApi | [BudgetsApi.md](docs/apis/BudgetsApi.md) |
+| CategoriesApi | [CategoriesApi.md](docs/apis/CategoriesApi.md) |
+| ChartsApi | [ChartsApi.md](docs/apis/ChartsApi.md) |
+| ConfigurationApi | [ConfigurationApi.md](docs/apis/ConfigurationApi.md) |
+| CurrenciesApi | [CurrenciesApi.md](docs/apis/CurrenciesApi.md) |
+| CurrencyExchangeRatesApi | [CurrencyExchangeRatesApi.md](docs/apis/CurrencyExchangeRatesApi.md) |
+| DataApi | [DataApi.md](docs/apis/DataApi.md) |
+| InsightApi | [InsightApi.md](docs/apis/InsightApi.md) |
+| LinksApi | [LinksApi.md](docs/apis/LinksApi.md) |
+| ObjectGroupsApi | [ObjectGroupsApi.md](docs/apis/ObjectGroupsApi.md) |
+| PiggyBanksApi | [PiggyBanksApi.md](docs/apis/PiggyBanksApi.md) |
+| PreferencesApi | [PreferencesApi.md](docs/apis/PreferencesApi.md) |
+| RecurrencesApi | [RecurrencesApi.md](docs/apis/RecurrencesApi.md) |
+| RuleGroupsApi | [RuleGroupsApi.md](docs/apis/RuleGroupsApi.md) |
+| RulesApi | [RulesApi.md](docs/apis/RulesApi.md) |
+| SearchApi | [SearchApi.md](docs/apis/SearchApi.md) |
+| SummaryApi | [SummaryApi.md](docs/apis/SummaryApi.md) |
+| TagsApi | [TagsApi.md](docs/apis/TagsApi.md) |
+| TransactionsApi | [TransactionsApi.md](docs/apis/TransactionsApi.md) |
+| UserGroupsApi | [UserGroupsApi.md](docs/apis/UserGroupsApi.md) |
+| UsersApi | [UsersApi.md](docs/apis/UsersApi.md) |
+| WebhooksApi | [WebhooksApi.md](docs/apis/WebhooksApi.md) |
 
 ## 🔧 Generation
 
@@ -309,7 +306,7 @@ curl -s "https://api.nuget.org/v3/registration3/Brotal.FireflyIII/index.json" | 
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
 ---
 
