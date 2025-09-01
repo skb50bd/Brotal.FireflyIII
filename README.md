@@ -1,5 +1,6 @@
 # 🔥 Brotal.FireflyIII
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/skb50bd/Brotal.FireflyIII/build-and-publish.yml)
 [![NuGet](https://img.shields.io/nuget/v/Brotal.FireflyIII.svg)](https://www.nuget.org/packages/Brotal.FireflyIII/)
 [![License](https://img.shields.io/github/license/skb50bd/Brotal.FireflyIII.svg)](./LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
