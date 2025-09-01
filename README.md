@@ -1,8 +1,8 @@
 # 🔥 Brotal.FireflyIII
 
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/skb50bd/Brotal.FireflyIII/build-and-publish.yml)
+[![Workflow](https://img.shields.io/github/actions/workflow/status/skb50bd/firefly-iii-ai-ingest/publish.yml)](https://github.com/skb50bd/Brotal.FireflyIII/actions)
 [![NuGet](https://img.shields.io/nuget/v/Brotal.FireflyIII.svg)](https://www.nuget.org/packages/Brotal.FireflyIII/)
-[![License](https://img.shields.io/github/license/skb50bd/Brotal.FireflyIII.svg)](./LICENSE)
+[![License](https://img.shields.io/github/license/skb50bd/Brotal.FireflyIII)](./LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
 
 A comprehensive .NET client library for the [Firefly III](https://firefly-iii.org/) personal finance manager API, automatically generated from the official OpenAPI specification.
@@ -35,8 +35,8 @@ This C# SDK provides a complete .NET client for the Firefly III API, enabling yo
 
 ### 📦 Package Details
 
-- **SDK Version**: 1.0.1
-- **Target Framework**: .NET 9.0
+- **SDK Version**: [![NuGet](https://img.shields.io/nuget/v/Brotal.FireflyIII.svg)](https://www.nuget.org/packages/Brotal.FireflyIII/)
+- **Target Framework**: [![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
 - **API Version**: Firefly III API v6.3.0
 - **Generator**: OpenAPI Generator 7.16.0-SNAPSHOT
 
